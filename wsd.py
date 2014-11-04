@@ -1,6 +1,6 @@
-import re
-import os
-from util import *
+from re import *
+from os import *
+import util as util
 from wsddata import *
 
 # simpleEFeatures(w) takes a word (in English) and generates relevant
