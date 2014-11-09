@@ -1,5 +1,4 @@
 from re import *
-from os import *
 import util as util
 from wsddata import *
 
@@ -21,8 +20,8 @@ def simpleEFeatures(w, wprob):
     # this word and a second feature for the two character suffix.
     # for example, on the word "happiness", generate "pre_ha" and
     # "suf_ss" as features.
-    ### TODO: YOUR CODE HERE
-    util.raiseNotDefined()
+    feats['pre_' + w[0:2]] = 1
+    feats['suf_' + w[-2:]] = 1
 
     return feats
 
@@ -39,16 +38,20 @@ def simpleFFeatures(doc, i, j):
     # generate a feature corresponding to the two character prefix of
     # this word and a second feature for the two character suffix; same
     # deal about pre_ and suf_
-    ### TODO: YOUR CODE HERE
-    util.raiseNotDefined()
+    feats['pre_' + w[0:2]] = 1
+    feats['suf_' + w[-2:]] = 1
 
     # generate features corresponding to the OTHER words in this
     # sentence.  for some other word "w", create a feature of the form
     # sc_w, where sc means "sentence context".  if a single word (eg.,
     # "the") appears twice in the context, the feature sc_the should
     # have value two.
-    ### TODO: YOUR CODE HERE
-    util.raiseNotDefined()
+    sent = doc[i]
+    for a in range(len(sent)):
+        #skip the actual word
+        if a == j:
+            continue
+        feats['sc_' + sent[a]] += 1
 
     return feats
 
