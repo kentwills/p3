@@ -3,6 +3,8 @@ import util as util
 from wsddata import *
 from unidecode import unidecode
 import features
+from nltk import stem
+import editdistance
 
 # simpleEFeatures(w) takes a word (in English) and generates relevant
 # features.  At the very least, this should include the word identity
@@ -90,8 +92,10 @@ def complexEFeatures(w, wprob):
     # this word and a second feature for the two character suffix.
     # for example, on the word "happiness", generate "pre_ha" and
     # "suf_ss" as features.
-    #feats['pre_' + w[0:2]] = 1
-    #feats['suf_' + w[-2:]] = 1
+    stemmer=stem.PorterStemmer()
+    feats['stem_'+stemmer.stem(w)] = 1
+    # feats['pre_' + w[0:2]] = 1
+    # feats['suf_' + w[-2:]] = 1
 
     return feats
 
@@ -108,8 +112,14 @@ def complexFFeatures(doc, i, j):
     # generate a feature corresponding to the two character prefix of
     # this word and a second feature for the two character suffix; same
     # deal about pre_ and suf_
-    feats['pre_' + w[0:2]] = 1
-    feats['suf_' + w[-2:]] = 1
+    #feats['pre_' + w[0:2]] = 1
+    try:
+        stemmer=stem.SnowballStemmer('french')
+        feats['stem_'+stemmer.stem(w)] = 1
+        print 'success'
+    except:
+        print w
+    # feats['suf_' + w[-2:]] = 1
 
     # generate features corresponding to the OTHER words in this
     # sentence.  for some other word "w", create a feature of the form
