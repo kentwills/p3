@@ -96,7 +96,9 @@ def complexEFeatures(w, wprob):
     return feats
 
 def complexFFeatures(doc, i, j):
-    w = doc[i][j]
+    # cannot do until we change evaluation strings
+    # w = unidecode(doc[i][j].lower())
+    w=doc[i][j]
 
     feats = Counter()
 
@@ -122,6 +124,10 @@ def complexFFeatures(doc, i, j):
         feats['sc_' + sent[a]] += 1
 
     features.word_left(doc[i],j, 1, feats)
+    features.word_left(doc[i],j, 2, feats)
+
+    #features.word_right(doc[i],j, 1, feats)
+    #features.word_right(doc[i],j, 2, feats)
 
     return feats
 
