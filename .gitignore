@@ -1,3 +1,7 @@
 .idea/*
 *.pyc
 *.tr
+*.te
+*.rawpredictions
+*.cache
+wsd_output
