@@ -22,8 +22,8 @@ def simpleEFeatures(w, wprob):
     # this word and a second feature for the two character suffix.
     # for example, on the word "happiness", generate "pre_ha" and
     # "suf_ss" as features.
-    #feats['pre_' + w[0:2]] = 1
-    #feats['suf_' + w[-2:]] = 1
+    feats['pre_' + w[0:2]] = 1
+    feats['suf_' + w[-2:]] = 1
 
     return feats
 
