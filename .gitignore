@@ -5,3 +5,4 @@
 *.rawpredictions
 *.cache
 wsd_output
+*.model
