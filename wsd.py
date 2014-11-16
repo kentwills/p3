@@ -1,10 +1,7 @@
-from re import *
-import util as util
 from wsddata import *
-from unidecode import unidecode
+import nltk
 import features
 from nltk import stem
-import editdistance
 
 # simpleEFeatures(w) takes a word (in English) and generates relevant
 # features.  At the very least, this should include the word identity
@@ -95,8 +92,6 @@ def complexEFeatures(w, wprob):
     stemmer=stem.PorterStemmer()
     stem_word = stemmer.stem(w)
     feats['stem_'+stem_word] = 1
-    # feats['pre_' + w[0:2]] = 1
-    #feats['suf_' + w.replace(stem_word,"")] = 1
 
     return feats
 
@@ -113,16 +108,9 @@ def complexFFeatures(doc, i, j):
     # generate a feature corresponding to the two character prefix of
     # this word and a second feature for the two character suffix; same
     # deal about pre_ and suf_
-    #feats['pre_' + w[0:2]] = 1
-    try:
-        stemmer=stem.SnowballStemmer('french')
-        stem_word = stemmer.stem(w)
-        feats['stem_'+stem_word] = 1
-        #feats['suf_' + w.replace(stem_word,"")] = 1
-        print 'success'
-    except:
-        print w
-    #
+    stemmer=stem.SnowballStemmer('french')
+    stem_word = stemmer.stem(w.decode('utf-8')).encode('utf-8')
+    feats['stem_'+stem_word] = 1
 
     # generate features corresponding to the OTHER words in this
     # sentence.  for some other word "w", create a feature of the form
@@ -136,12 +124,22 @@ def complexFFeatures(doc, i, j):
             continue
         feats['sc_' + sent[a]] += 1
 
-    features.word_left(doc[i],j, 1, feats)
-    features.word_left(doc[i],j, 2, feats)
 
-    #features.word_right(doc[i],j, 1, feats)
-    #features.word_right(doc[i],j, 2, feats)
+    pull_out_nouns(sent, feats)
 
+    word_left(doc[i],j, 1, feats)
+    word_left(doc[i],j, 2, feats)
+
+    word_right(doc[i],j, 1, feats)
+    word_right(doc[i],j, 2, feats)
+
+    # no left 0.781809462916
+    #pos_left(doc[i],j, 1, feats)
+    #pos_left(doc[i],j, 2, feats)
+
+    # no right .781489769821
+    pos_right(doc[i],j, 1, feats)
+    pos_right(doc[i],j, 2, feats)
     return feats
 
 def complexPairFeatures(doc, i, j, ew, wprob):
@@ -157,7 +155,77 @@ def complexPairFeatures(doc, i, j, ew, wprob):
 
     return feats
 
+def pull_out_nouns(sent, feats):
+    for a in range(len(sent)):
+        word = sent[a].decode('utf-8')
+        if word in data.keys():
+            if data[word] == 'NC':
+                feats['nc_' + sent[a]] += 1
+
+def pos_left(sentence, index_word, num_left, feats):
+    # nonzero index
+    if (index_word-num_left) < 0:
+        return
+
+    word = sentence[index_word-num_left].decode('utf-8')
+    if word in data.keys():
+        pos = data[word]
+        feature_string = 'posl_%s_%s' % (num_left, pos.decode('utf-8'))
+        feats[feature_string] += 1
+
+def pos_right(sentence, index_word, num_right, feats):
+    # nonzero index
+    if (index_word+num_right) >= len(sentence):
+        return
+
+    word = sentence[index_word+num_right].decode('utf-8')
+    if word in data.keys():
+        pos = data[word]
+        feature_string = 'posr_%s_%s' % (num_right, pos.decode('utf-8'))
+        feats[feature_string] += 1
+
+# We develop features by adding a name and a count, the name is constructed based on context
+def word_left(sentence, index_word, num_left, feats):
+    # nonzero index
+    if (index_word-num_left) < 0:
+        return
+
+    feature_string = 'wl_%s_%s' % (num_left, sentence[index_word-num_left])
+    feats[feature_string] += 1
+
+def word_right(sentence, index_word, num_right, feats):
+    # nonzero index
+    if (index_word+num_right) >= len(sentence):
+        return
+
+    feature_string = 'wr_%s_%s' % (num_right, sentence[index_word+num_right])
+    feats[feature_string] += 1
+
+
+def tree():
+
+    fname = 'Science-parsed.de'
+    data1 = tree_file(fname)
+    fname = 'Science-parsed.de'
+    data2 = tree_file(fname)
+    return dict(data1.items()+data2.items())
+
+def tree_file(fname):
+    data = {}
+    with open(fname) as f:
+        content = f.readlines()
+    for c in content:
+        try:
+            test = nltk.Tree.fromstring(c.decode('utf-8')).pos()
+            for t in test:
+                data[t[0]] = t[1]
+        except:
+            print c
+
+    return data
+
 if __name__ == "__main__":
+    data = tree()
     (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.te', complexFFeatures, complexEFeatures, complexPairFeatures, quietVW=True)
     print 'training accuracy =', train_acc
     print 'testing  accuracy =', test_acc
