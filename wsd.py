@@ -93,9 +93,10 @@ def complexEFeatures(w, wprob):
     # for example, on the word "happiness", generate "pre_ha" and
     # "suf_ss" as features.
     stemmer=stem.PorterStemmer()
-    feats['stem_'+stemmer.stem(w)] = 1
+    stem_word = stemmer.stem(w)
+    feats['stem_'+stem_word] = 1
     # feats['pre_' + w[0:2]] = 1
-    # feats['suf_' + w[-2:]] = 1
+    #feats['suf_' + w.replace(stem_word,"")] = 1
 
     return feats
 
@@ -115,11 +116,13 @@ def complexFFeatures(doc, i, j):
     #feats['pre_' + w[0:2]] = 1
     try:
         stemmer=stem.SnowballStemmer('french')
-        feats['stem_'+stemmer.stem(w)] = 1
+        stem_word = stemmer.stem(w)
+        feats['stem_'+stem_word] = 1
+        #feats['suf_' + w.replace(stem_word,"")] = 1
         print 'success'
     except:
         print w
-    # feats['suf_' + w[-2:]] = 1
+    #
 
     # generate features corresponding to the OTHER words in this
     # sentence.  for some other word "w", create a feature of the form
@@ -155,7 +158,7 @@ def complexPairFeatures(doc, i, j, ew, wprob):
     return feats
 
 if __name__ == "__main__":
-    (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.de', complexFFeatures, complexEFeatures, complexPairFeatures, quietVW=True)
+    (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.te', complexFFeatures, complexEFeatures, complexPairFeatures, quietVW=True)
     print 'training accuracy =', train_acc
     print 'testing  accuracy =', test_acc
     h = open('wsd_output', 'w')
