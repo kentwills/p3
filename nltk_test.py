@@ -1,5 +1,5 @@
+from __future__ import unicode_literals
 import nltk
-import string
 
 def main():
     tree()
@@ -16,12 +16,11 @@ def tree():
     with open(fname) as f:
         content = f.readlines()
     for c in content:
-        try:
-            test = nltk.Tree.fromstring(c.decode('utf-8')).pos()
+        sentence = c.strip()
+        if len(sentence) > 1:
+            test = nltk.Tree.fromstring(sentence).pos()
             for t in test:
                 data[t[0]] = t[1]
-        except:
-            print c
 
     return data
 
