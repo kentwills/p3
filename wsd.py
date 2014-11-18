@@ -159,9 +159,8 @@ def complexPairFeatures(doc, i, j, ew, wprob):
 def pull_out_nouns(sent, feats):
     for a in range(len(sent)):
         word = sent[a].decode('utf-8')
-        if word in data.keys():
-            if data[word] == 'NC':
-                feats['nc_' + word] += 1
+        if data.get(word) == 'NC':
+            feats['nc_' + word] += 1
 
 
 def pos_left(sentence, index_word, num_left, feats):
@@ -170,8 +169,8 @@ def pos_left(sentence, index_word, num_left, feats):
         return
 
     word = sentence[index_word - num_left].decode('utf-8')
-    if word in data.keys():
-        pos = data[word]
+    pos = data.get(word)
+    if pos:
         feature_string = 'posl_%s_%s' % (num_left, pos.decode('utf-8'))
         feats[feature_string] += 1
 
@@ -182,8 +181,8 @@ def pos_right(sentence, index_word, num_right, feats):
         return
 
     word = sentence[index_word + num_right].decode('utf-8')
-    if word in data.keys():
-        pos = data[word]
+    pos = data.get(word)
+    if pos:
         feature_string = 'posr_%s_%s' % (num_right, pos.decode('utf-8'))
         feats[feature_string] += 1
 
