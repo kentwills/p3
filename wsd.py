@@ -119,14 +119,17 @@ def complexFFeatures(doc, i, j):
     # "the") appears twice in the context, the feature sc_the should
     # have value two.
     sent = doc[i]
+    '''
     for a in range(len(sent)):
         # skip the actual word
         if a == j:
             continue
-        feats['sc_' + sent[a]] += 1
+        if not hasNumbers(sent[a]):
+            feats['sc_' + sent[a]] += 1
 
+    '''
 
-    # pull_out_nouns(sent, feats)
+    pull_out_nouns(sent, feats)
 
     word_left(doc[i], j, 1, feats)
     word_left(doc[i], j, 2, feats)
@@ -134,12 +137,16 @@ def complexFFeatures(doc, i, j):
     word_right(doc[i], j, 1, feats)
     word_right(doc[i], j, 2, feats)
 
-    pos_left(doc[i], j, 1, feats)
-    pos_left(doc[i], j, 2, feats)
+    # pos_left(doc[i], j, 1, feats)
+    #pos_left(doc[i], j, 2, feats)
 
     #pos_right(doc[i],j, 1, feats)
     #pos_right(doc[i],j, 2, feats)
     return feats
+
+
+def hasNumbers(input_string):
+    return any(char.isdigit() for char in input_string)
 
 
 def complexPairFeatures(doc, i, j, ew, wprob):
@@ -159,9 +166,12 @@ def complexPairFeatures(doc, i, j, ew, wprob):
 def pull_out_nouns(sent, feats):
     for a in range(len(sent)):
         word = sent[a].decode('utf-8')
-        if word in data.keys():
-            if data[word] == 'NC':
+        if data.get(word) == 'NC':
+            if not hasNumbers(word):
                 feats['nc_' + word] += 1
+        elif data.get(word) == 'V':
+            if not hasNumbers(word):
+                feats['v_' + word] += 1
 
 
 def pos_left(sentence, index_word, num_left, feats):
@@ -194,8 +204,10 @@ def word_left(sentence, index_word, num_left, feats):
     if (index_word - num_left) < 0:
         return
 
-    feature_string = 'wl_%s_%s' % (num_left, sentence[index_word - num_left])
-    feats[feature_string] += 1
+    word = sentence[index_word - num_left]
+    feature_string = 'wl_%s_%s' % (num_left, word)
+    if not hasNumbers(word):
+        feats[feature_string] += 1
 
 
 def word_right(sentence, index_word, num_right, feats):
@@ -203,8 +215,10 @@ def word_right(sentence, index_word, num_right, feats):
     if (index_word + num_right) >= len(sentence):
         return
 
-    feature_string = 'wr_%s_%s' % (num_right, sentence[index_word + num_right])
-    feats[feature_string] += 1
+    word = sentence[index_word + num_right]
+    feature_string = 'wr_%s_%s' % (num_right, word)
+    if not hasNumbers(word):
+        feats[feature_string] += 1
 
 
 def tree():
