@@ -119,15 +119,14 @@ def complexFFeatures(doc, i, j):
     # "the") appears twice in the context, the feature sc_the should
     # have value two.
     sent = doc[i]
-    '''
+
     for a in range(len(sent)):
         # skip the actual word
         if a == j:
             continue
-        if not hasNumbers(sent[a]):
-            feats['sc_' + sent[a]] += 1
+        feats['sc_' + sent[a]] += 1
 
-    '''
+
 
 
     #pull_out_all_pos(sent, feats)
@@ -138,8 +137,8 @@ def complexFFeatures(doc, i, j):
     word_right(doc[i], j, 1, feats)
     word_right(doc[i], j, 2, feats)
 
-    # pos_left(doc[i], j, 1, feats)
-    #pos_left(doc[i], j, 2, feats)
+    pos_left(doc[i], j, 1, feats)
+    pos_left(doc[i], j, 2, feats)
 
     #pos_right(doc[i], j, 1, feats)
     #pos_right(doc[i], j, 2, feats)
@@ -164,10 +163,6 @@ def complexPairFeatures(doc, i, j, ew, wprob):
     return feats
 
 
-def hasNumbers(inputString):
-    return any(char.isdigit() for char in inputString)
-
-
 def pull_out_all_pos(sent, feats):
     for a in range(len(sent)):
         word = sent[a]
@@ -181,9 +176,9 @@ def pos_left(sentence, index_word, num_left, feats):
     if (index_word - num_left) < 0:
         return
 
-    word = sentence[index_word - num_left].decode('utf-8')
-    if word in data.keys():
-        pos = data[word]
+    word = sentence[index_word - num_left]
+    pos = data.get(word)
+    if pos:
         feature_string = 'posl_%s_%s' % (num_left, pos.decode('utf-8'))
         feats[feature_string] += 1
 
@@ -193,9 +188,9 @@ def pos_right(sentence, index_word, num_right, feats):
     if (index_word + num_right) >= len(sentence):
         return
 
-    word = sentence[index_word + num_right].decode('utf-8')
-    if word in data.keys():
-        pos = data[word]
+    word = sentence[index_word + num_right]
+    pos = data.get(word)
+    if pos:
         feature_string = 'posr_%s_%s' % (num_right, pos.decode('utf-8'))
         feats[feature_string] += 1
 
@@ -223,8 +218,7 @@ def word_right(sentence, index_word, num_right, feats):
 
 def tree():
     data1 = tree_file('Science-parsed.de')
-    data2 = tree_file('Science-parsed.tr')
-    return dict(data1.items() + data2.items())
+    return data1
 
 
 def tree_file(fname):
