@@ -215,7 +215,7 @@ def runExperiment(trainingFile, testFile, getFFeatures, getEFeatures, getPairFea
 
 
 def trainVW(dataFilename, modelFilename, quietVW=False):
-    cmd = vw + ' -k -c -b 25 --holdout_off --passes 10 -q st --power_t 0.5 --csoaa_ldf m -d ' + dataFilename + ' -f ' + modelFilename
+    cmd = vw + ' -k -c -b 25 --holdout_off --passes 20 -q st --power_t 0.5 --csoaa_ldf m -d ' + dataFilename + ' -f ' + modelFilename
     if quietVW: cmd += ' --quiet'
     print 'executing: ', cmd
     p = os.system(cmd)

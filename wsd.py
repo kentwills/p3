@@ -129,7 +129,8 @@ def complexFFeatures(doc, i, j):
 
     '''
 
-    pull_out_nouns(sent, feats)
+
+    #pull_out_all_pos(sent, feats)
 
     word_left(doc[i], j, 1, feats)
     word_left(doc[i], j, 2, feats)
@@ -140,8 +141,8 @@ def complexFFeatures(doc, i, j):
     # pos_left(doc[i], j, 1, feats)
     #pos_left(doc[i], j, 2, feats)
 
-    #pos_right(doc[i],j, 1, feats)
-    #pos_right(doc[i],j, 2, feats)
+    #pos_right(doc[i], j, 1, feats)
+    #pos_right(doc[i], j, 2, feats)
     return feats
 
 
@@ -163,15 +164,16 @@ def complexPairFeatures(doc, i, j, ew, wprob):
     return feats
 
 
-def pull_out_nouns(sent, feats):
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)
+
+
+def pull_out_all_pos(sent, feats):
     for a in range(len(sent)):
-        word = sent[a].decode('utf-8')
-        if data.get(word) == 'NC':
-            if not hasNumbers(word):
-                feats['nc_' + word] += 1
-        elif data.get(word) == 'V':
-            if not hasNumbers(word):
-                feats['v_' + word] += 1
+        word = sent[a]
+        pos = data.get(word)
+        if pos:
+            feats[pos] += 1
 
 
 def pos_left(sentence, index_word, num_left, feats):
@@ -206,8 +208,7 @@ def word_left(sentence, index_word, num_left, feats):
 
     word = sentence[index_word - num_left]
     feature_string = 'wl_%s_%s' % (num_left, word)
-    if not hasNumbers(word):
-        feats[feature_string] += 1
+    feats[feature_string] += 1
 
 
 def word_right(sentence, index_word, num_right, feats):
@@ -217,13 +218,12 @@ def word_right(sentence, index_word, num_right, feats):
 
     word = sentence[index_word + num_right]
     feature_string = 'wr_%s_%s' % (num_right, word)
-    if not hasNumbers(word):
-        feats[feature_string] += 1
+    feats[feature_string] += 1
 
 
 def tree():
     data1 = tree_file('Science-parsed.de')
-    data2 = tree_file('Science-parsed.de')
+    data2 = tree_file('Science-parsed.tr')
     return dict(data1.items() + data2.items())
 
 
@@ -232,18 +232,18 @@ def tree_file(fname):
     with open(fname) as f:
         content = f.readlines()
     for c in content:
-        sentence = c.strip()
+        sentence = c.strip().decode('utf-8')
         if len(sentence) > 1:
             test = nltk.Tree.fromstring(sentence).pos()
             for t in test:
-                data[t[0]] = t[1]
-
+                data[t[0].encode('utf-8')] = t[1].encode('utf-8')
+    print 'loaded pos'
     return data
 
 
 if __name__ == "__main__":
     data = tree()
-    (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.de', complexFFeatures, complexEFeatures,
+    (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.te', complexFFeatures, complexEFeatures,
                                                      complexPairFeatures, quietVW=True)
     print 'training accuracy =', train_acc
     print 'testing  accuracy =', test_acc
