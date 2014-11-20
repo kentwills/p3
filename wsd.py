@@ -131,16 +131,26 @@ def complexFFeatures(doc, i, j):
 
     # pull_out_all_pos(sent, feats)
 
-    word_left(doc[i], j, 1, feats)
-    word_left(doc[i], j, 2, feats)
+    ngram_left(doc[i], j, 1, feats)
+    ngram_left(doc[i], j, 2, feats)
+    ngram_left(doc[i], j, 3, feats)
+    ngram_left(doc[i], j, 4, feats)
+    #word_left(doc[i], j, 1, feats)
+    #word_left(doc[i], j, 2, feats)
 
-    word_right(doc[i], j, 1, feats)
-    word_right(doc[i], j, 2, feats)
+    ngram_right(doc[i], j, 1, feats)
+    ngram_right(doc[i], j, 2, feats)
+    #word_right(doc[i], j, 1, feats)
+    #word_right(doc[i], j, 2, feats)
 
-    pos_left(doc[i], j, 1, feats)
-    pos_left(doc[i], j, 2, feats)
+    pos_ngram_left(doc[i], j, 1, feats)
+    pos_ngram_left(doc[i], j, 2, feats)
+    pos_ngram_left(doc[i], j, 3, feats)
+    pos_ngram_left(doc[i], j, 4, feats)
+    #pos_left(doc[i], j, 1, feats)
+    #pos_left(doc[i], j, 2, feats)
 
-    #pos_right(doc[i], j, 1, feats)
+    pos_right(doc[i], j, 1, feats)
     #pos_right(doc[i], j, 2, feats)
     return feats
 
@@ -171,6 +181,23 @@ def pull_out_all_pos(sent, feats):
             feats[pos] += 1
 
 
+def pos_ngram_left(sentence, index_word, num_left, feats):
+    # nonzero index
+    if (index_word - num_left) < 0:
+        return
+
+    pos=""
+    pos_all=""
+    for i in range(index_word-num_left, index_word):
+        word = sentence[i]
+        pos = data.get(word)
+        if pos:
+            pos_all = pos_all + "_"+ data.get(word)
+    if pos:
+        feature_string = 'posl_%s_%s' % (num_left, pos_all.decode('utf-8'))
+        feats[feature_string] += 1
+
+
 def pos_left(sentence, index_word, num_left, feats):
     # nonzero index
     if (index_word - num_left) < 0:
@@ -193,6 +220,30 @@ def pos_right(sentence, index_word, num_right, feats):
     if pos:
         feature_string = 'posr_%s_%s' % (num_right, pos.decode('utf-8'))
         feats[feature_string] += 1
+
+
+def ngram_left(sentence, index_word, num_left, feats):
+    # nonzero index
+    if (index_word - num_left) < 0:
+        return
+
+    word=""
+    for i in range(index_word-num_left, index_word):
+        word = word + "_" + sentence[i]
+    feature_string = 'nl_%s_%s' % (num_left, word)
+    feats[feature_string] += 1
+
+
+def ngram_right(sentence, index_word, num_right, feats):
+    # nonzero index
+    if (index_word + num_right) > len(sentence):
+        return
+
+    word=""
+    for i in range(index_word, index_word+num_right):
+        word = word + "_" + sentence[i]
+    feature_string = 'nr_%s_%s' % (num_right, word)
+    feats[feature_string] += 1
 
 
 # We develop features by adding a name and a count, the name is constructed based on context
@@ -237,7 +288,7 @@ def tree_file(fname):
 
 if __name__ == "__main__":
     data = tree()
-    (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.te', complexFFeatures, complexEFeatures,
+    (train_acc, test_acc, test_pred) = runExperiment('Science.tr', 'Science.de', complexFFeatures, complexEFeatures,
                                                      complexPairFeatures, quietVW=True)
     print 'training accuracy =', train_acc
     print 'testing  accuracy =', test_acc
