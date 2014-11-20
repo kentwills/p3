@@ -135,6 +135,8 @@ def complexFFeatures(doc, i, j):
     ngram_left(doc[i], j, 2, feats)
     ngram_left(doc[i], j, 3, feats)
     ngram_left(doc[i], j, 4, feats)
+    ngram_left(doc[i], j, 5, feats)
+    ngram_left(doc[i], j, 6, feats)
     #word_left(doc[i], j, 1, feats)
     #word_left(doc[i], j, 2, feats)
 
@@ -147,6 +149,8 @@ def complexFFeatures(doc, i, j):
     pos_ngram_left(doc[i], j, 2, feats)
     pos_ngram_left(doc[i], j, 3, feats)
     pos_ngram_left(doc[i], j, 4, feats)
+    pos_ngram_left(doc[i], j, 5, feats)
+    pos_ngram_left(doc[i], j, 6, feats)
     #pos_left(doc[i], j, 1, feats)
     #pos_left(doc[i], j, 2, feats)
 
